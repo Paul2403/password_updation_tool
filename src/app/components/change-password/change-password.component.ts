@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { PassServicesService } from 'src/app/pass-services.service';
+import { Subscription } from 'rxjs';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
 
 @Component({
@@ -15,6 +18,9 @@ export class ChangePasswordComponent implements OnInit {
   public newPassword:any='';
   public retypeNewPassword:any='';
   public weakPasswords:any;
+  public credentialCheck:any;
+  
+  private subscriptionCollection: Subscription = new Subscription();
  
   power:any=0;
   char:any='';
@@ -22,13 +28,27 @@ export class ChangePasswordComponent implements OnInit {
   lowerCount:any='';
   special:any='';
   digits:any='';
+  errMsg:any;
   errorMessage:any='';
+  commonpsswd:any='';
+  public passwordAuthForm = new FormGroup({
+    fEmail: new FormControl('', [Validators.required, Validators.email]),
+    fCurrentPassword: new FormControl('', Validators.required),
+    fNewPassword: new FormControl(''),
+    fConfirmPassword: new FormControl('', Validators.required)
+  });
 
   
 
-  constructor() { }
+  constructor(private passService: PassServicesService,public formBuilder: FormBuilder) { }
 
   ngOnInit() {
+   this.passwordAuthForm = new FormGroup({
+    fEmail: new FormControl('', [Validators.required, Validators.email]),
+    fCurrentPassword: new FormControl('', Validators.required),
+    fNewPassword: new FormControl(''),
+    fConfirmPassword: new FormControl('', Validators.required)
+  });
    
     this.power = document.querySelector('#power-point');
     this.char = document.querySelector('#charNum');
@@ -36,6 +56,7 @@ export class ChangePasswordComponent implements OnInit {
     this.lowerCount = document.querySelector('#lower_count');
     this.special =document.querySelector('#special_count');
     this.digits=document.querySelector('#digits_count');
+    this.commonpsswd=document.querySelector('#common_passwd');
     this.errorMessage=document.querySelector('#banner');
     this.weakPasswords = [
       "Password1!",
@@ -145,36 +166,93 @@ export class ChangePasswordComponent implements OnInit {
     ];
   }
 
+  updatePsswordMain(){
+
+  }
+
+  updatePassword(){
+    if(this.passwordAuthForm) {
+      if(this.passwordAuthForm.get('fNewPassword')?.value == this.passwordAuthForm.get('fConfirmPassword')?.value){
+        this.errorMessage.style.display = "none";
+        let passCheckParams={
+          "email_id": this.passwordAuthForm.get('fEmail')?.value,
+          "current_password": this.passwordAuthForm.get('fCurrentPassword')?.value
+          };
+          const createSubscription = this.passService.getData(passCheckParams).subscribe(response => {
+            if(response.status == 200){
+              this.credentialCheck = response.data.id;
+              if(this.credentialCheck){
+                this.updatePsswordMain();
+              }
+            }
+            else{
+      
+            }
+          }, err => {
+            console.log('error', err);
+          
+          });
+          this.subscriptionCollection.add(createSubscription);
+      }
+      else{
+        this.errorMessage.style.display = "block";
+        this.errMsg = 'Passwords do not match!';
+      }
+   
+
+
+    // this.service.getData().subscribe((response) => {
+    //   console.log('Response from API is ', response)
+    // }, (error)=>{
+    //   console.log('Error is ', error);
+    // })
+  }
+  }
+
   showPasswordStrength(object:any) {
     let point = 0;
     let value = this.newPassword;
     var maxLength = 50;
     var strLength = object.length;
     let widthPower = ['1%', '25%', '50%', '75%', '100%'];
-    let colorPower = ['#D73F40', '#DC6551', '#F2B84F', '#BDE952', '#30CEC7'];
+    let colorPower = ['#D73F40', '#DC6551', '#F2B84F', '30CEC7','#BDE952'];
 
-    if(value.length >= 12){
-        let arrayTest = [
-            /[0-9]/,
-            /[a-z]/,
-            /[A-Z]/,
-            /[^0-9a-zA-Z]/
-        ];
+    // if(value.length >= 10){
+    //     let arrayTest = [
+    //         /[0-9]/,
+    //         /[a-z]/,
+    //         /[A-Z]/,
+    //         /[^0-9a-zA-Z]/
+    //     ];
   
 
-        arrayTest.forEach(item => {
-            if(item.test(value)){
-                point += 1;
-            }
-        });
-    }
+        // arrayTest.forEach(item => {
+        //     if(item.test(value)){
+        //         point += 1;
+        //     }
+        // });
+        if(this.hasUppercase(object) == true){
+          if(this.hasLowercase(object) == true){
+            point += 1;
+          }
+        }
+        if(this.hasNumbers(object) == true){
+          point += 1;
+        }
+        if(this.hasSpecialCharacters(object) == true){
+          point += 1;
+        }
+        if(value.length>=10){
+          point += 1;
+        }
+    // }
 
     this.power.style.width = widthPower[point];
     this.power.style.backgroundColor = colorPower[point];
 
     if(strLength > maxLength){
       this.char.innerHTML = '<span style="color: red;">'+strLength+' characters containing: </span>';
-  }else{
+    }
     this.char.innerHTML = strLength+' characters containing: ';
       if(this.hasUppercase(object) == true){
           this.upperCount.style.color = '#72D2CB';
@@ -206,7 +284,7 @@ export class ChangePasswordComponent implements OnInit {
       else{
           this.special.style.color = '#5b6262';
       }
-  }
+  
   this.commonPasswordCheck(object);
 
     
@@ -237,22 +315,36 @@ export class ChangePasswordComponent implements OnInit {
     let point = 0;
     let value = this.newPassword;
     let widthPower = ['1%', '25%', '50%', '75%', '100%'];
-    let colorPower = ['#D73F40', '#DC6551', '#F2B84F', '#BDE952', '#30CEC7'];
+    let colorPower = ['#D73F40', '#DC6551', '#F2B84F', '30CEC7','#BDE952'];
     // var errorMessage = document.getElementById("banner");
     let errorDetected = 0;
-        if(value.length >= 12){
-        let arrayTest = [
-            /[0-9]/,
-            /[a-z]/,
-            /[A-Z]/,
-            /[^0-9a-zA-Z]/
-        ];
-        arrayTest.forEach(item => {
-          if(item.test(value)){
-              point += 1;
-          }
-      });
+    if(this.hasUppercase(obj) == true){
+      if(this.hasLowercase(obj) == true){
+        point += 1;
+      }
     }
+    if(this.hasNumbers(obj) == true){
+      point += 1;
+    }
+    if(this.hasSpecialCharacters(obj) == true){
+      point += 1;
+    }
+    if(value.length>=10){
+      point += 1;
+    }
+    //     if(value.length >= 10){
+    //     let arrayTest = [
+    //         /[0-9]/,
+    //         /[a-z]/,
+    //         /[A-Z]/,
+    //         /[^0-9a-zA-Z]/
+    //     ];
+    //     arrayTest.forEach(item => {
+    //       if(item.test(value)){
+    //           point += 1;
+    //       }
+    //   });
+    // }
     for (const pwd of this.weakPasswords) {
       if (obj == pwd){
           point = 0;
@@ -262,12 +354,16 @@ export class ChangePasswordComponent implements OnInit {
       }
   }
   if(errorDetected>0){
-      this.errorMessage.style.display = "block";
+      this.commonpsswd.style.color = '#fb2035';
+    }
+    else{
+      this.commonpsswd.style.color = '#5b6262';
+    }
   }
-  else{
-      this.errorMessage.style.display = "none";
-  }
-  }
+  // else{
+  //     // this.errorMessage.style.display = "none";
+  // }
+  
 
 
   togglePasswordType(passType: any){

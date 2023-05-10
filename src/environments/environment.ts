@@ -3,7 +3,19 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  heartBeat: {
+    url: "'http://localhost:3000'",
+    timeout: 30000
+  },
+  sr: {
+    url: "'http://localhost:3000'",
+    cross_url: "http://localhost:3000",
+    socket: {
+      url: "'http://localhost:3000'",
+      path: "/socket/"
+    }
+  }
 };
 
 /*
