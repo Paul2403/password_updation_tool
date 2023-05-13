@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { PassServicesService } from 'src/app/pass-services.service';
 import { Subscription } from 'rxjs';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -12,6 +13,8 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 export class ChangePasswordComponent implements OnInit {
 
   public currentPassword:any='';
+  public email:any=''
+  public twoFactor:any='';
   public showCurrentPassword: boolean = false;
   public showNewPassword: boolean = false;
   public showRetypeNewPassword:boolean = false;
@@ -19,6 +22,7 @@ export class ChangePasswordComponent implements OnInit {
   public retypeNewPassword:any='';
   public weakPasswords:any;
   public credentialCheck:any;
+  public twoFaModel:any=true;
   
   private subscriptionCollection: Subscription = new Subscription();
  
@@ -29,18 +33,27 @@ export class ChangePasswordComponent implements OnInit {
   special:any='';
   digits:any='';
   errMsg:any;
+  otpScreen:boolean = true;
+  showClose:boolean=true;
+  optExpired:boolean=false;
+  validOTP:boolean=true;
+  headMsg:any='Two-Factor Authentication'
   errorMessage:any='';
   commonpsswd:any='';
   public passwordAuthForm = new FormGroup({
     fEmail: new FormControl('', [Validators.required, Validators.email]),
     fCurrentPassword: new FormControl('', Validators.required),
-    fNewPassword: new FormControl(''),
+    fNewPassword: new FormControl('',Validators.required),
     fConfirmPassword: new FormControl('', Validators.required)
   });
 
+  public tfA = new FormGroup({
+    ftfA: new FormControl('',Validators.required)
+  })
+
   
 
-  constructor(private passService: PassServicesService,public formBuilder: FormBuilder) { }
+  constructor(private passService: PassServicesService,public formBuilder: FormBuilder,private router: Router) { }
 
   ngOnInit() {
    this.passwordAuthForm = new FormGroup({
@@ -58,6 +71,7 @@ export class ChangePasswordComponent implements OnInit {
     this.digits=document.querySelector('#digits_count');
     this.commonpsswd=document.querySelector('#common_passwd');
     this.errorMessage=document.querySelector('#banner');
+    this.twoFaModel= false;
     this.weakPasswords = [
       "Password1!",
       "Helloworld123!",
@@ -167,26 +181,96 @@ export class ChangePasswordComponent implements OnInit {
   }
 
   updatePsswordMain(){
+    this.headMsg='Two-Factor Authentication';
+    this.twoFactor='';
+    this.optExpired=false;
+    this.validOTP=true;
+    this.twoFaModel = true;
+    let otpParams={
+      "email_id": this.passwordAuthForm.get('fEmail')?.value,
+      
+      };
+      const createSubscription = this.passService.sendOTP(otpParams).subscribe(response => {
+        // if(response.status == 200){
+        //   this.credentialCheck = response.data.id;
+        //   if(this.credentialCheck){
+        //     this.updatePsswordMain();
+        //   }
+        // }
+        // else{
+  
+        // }
+      }, err => {
+        console.log('error', err);
+      
+      });
+      this.subscriptionCollection.add(createSubscription);
+  }
 
+  submitOTP(){
+    let otpConfirmParams={
+      "otp": this.twoFactor,
+      "id": this.credentialCheck,
+      "passwd":this.passwordAuthForm.get('fNewPassword')?.value
+      };
+      const createSubscription = this.passService.confirmOTP(otpConfirmParams).subscribe(response => {
+        if(response.status == 200){
+          this.headMsg='';
+          this.showClose=false;
+          this.otpScreen=false;
+          this.optExpired=false;
+          this.validOTP=true;
+        }
+        else if(response.status == 100){
+          this.headMsg='OTP Expired';
+          this.optExpired=true;
+          this.validOTP=true;
+        }
+        else{
+          this.headMsg='Two-Factor Authentication';
+          this.optExpired=false;
+          this.validOTP=false;
+        }
+        // if(response.status == 200){
+        //   this.credentialCheck = response.data.id;
+        //   if(this.credentialCheck){
+        //     this.updatePsswordMain();
+        //   }
+        // }
+        // else{
+  
+        // }
+      }, err => {
+        console.log('error', err);
+      
+      });
+      this.subscriptionCollection.add(createSubscription);
+  }
+
+  goToHomePage(){
+    window.location.reload();
   }
 
   updatePassword(){
-    if(this.passwordAuthForm) {
-      if(this.passwordAuthForm.get('fNewPassword')?.value == this.passwordAuthForm.get('fConfirmPassword')?.value){
+      if(((this.passwordAuthForm.get('fEmail')?.value !== '' && this.passwordAuthForm.get('fEmail')?.value !== undefined && this.passwordAuthForm.get('fEmail')?.value !== null)) && ((this.passwordAuthForm.get('fCurrentPassword')?.value !== '' && this.passwordAuthForm.get('fCurrentPassword')?.value !== undefined && this.passwordAuthForm.get('fCurrentPassword')?.value !== null)) && ((this.passwordAuthForm.get('fNewPassword')?.value !== '' && this.passwordAuthForm.get('fNewPassword')?.value !== undefined && this.passwordAuthForm.get('fNewPassword')?.value !== null)) && ((this.passwordAuthForm.get('fConfirmPassword')?.value !== '' && this.passwordAuthForm.get('fConfirmPassword')?.value !== undefined && this.passwordAuthForm.get('fConfirmPassword')?.value !== null))){
         this.errorMessage.style.display = "none";
-        let passCheckParams={
-          "email_id": this.passwordAuthForm.get('fEmail')?.value,
-          "current_password": this.passwordAuthForm.get('fCurrentPassword')?.value
+      if(this.passwordAuthForm.get('fNewPassword')?.value == this.passwordAuthForm.get('fConfirmPassword')?.value){
+           this.errorMessage.style.display = "none";
+           let passCheckParams={
+              "email_id": this.passwordAuthForm.get('fEmail')?.value,
+              "current_password": this.passwordAuthForm.get('fCurrentPassword')?.value,
           };
           const createSubscription = this.passService.getData(passCheckParams).subscribe(response => {
             if(response.status == 200){
               this.credentialCheck = response.data.id;
+              console.log('CREDENTIAL CHECK',this.credentialCheck);
               if(this.credentialCheck){
                 this.updatePsswordMain();
               }
             }
             else{
-      
+              this.errorMessage.style.display = "block";
+              this.errMsg = 'Ivalid Current Password!';
             }
           }, err => {
             console.log('error', err);
@@ -198,6 +282,14 @@ export class ChangePasswordComponent implements OnInit {
         this.errorMessage.style.display = "block";
         this.errMsg = 'Passwords do not match!';
       }
+      }
+      else{
+        this.errorMessage.style.display = "block";
+        this.errMsg = 'Please Enter All Fields!';
+      }
+
+
+
    
 
 
@@ -206,7 +298,7 @@ export class ChangePasswordComponent implements OnInit {
     // }, (error)=>{
     //   console.log('Error is ', error);
     // })
-  }
+  
   }
 
   showPasswordStrength(object:any) {

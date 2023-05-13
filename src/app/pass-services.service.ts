@@ -63,4 +63,30 @@ export class PassServicesService {
       })
     )
   }
+
+  public sendOTP(data: any): Observable<any> {
+    return this.http.post(`http://localhost:3000/user/otp`, data, {
+      observe: 'response'
+    }).pipe(
+      map(res => {
+        return res.body;
+      }),
+      catchError((e: any) => {
+        return throwError(e)
+      })
+    )
+  }
+
+  public confirmOTP(data: any): Observable<any> {
+    return this.http.post(`http://localhost:3000/user/otpConfirm`, data, {
+      observe: 'response'
+    }).pipe(
+      map(res => {
+        return res.body;
+      }),
+      catchError((e: any) => {
+        return throwError(e)
+      })
+    )
+  }
 }
