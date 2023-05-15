@@ -3,6 +3,9 @@ import { PassServicesService } from 'src/app/pass-services.service';
 import { Subscription } from 'rxjs';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { SHA256 } from 'crypto-js';
+import * as bcrypt from 'bcryptjs';
+import * as CryptoJS from 'crypto-js';
 
 
 @Component({
@@ -56,6 +59,10 @@ export class ChangePasswordComponent implements OnInit {
   constructor(private passService: PassServicesService,public formBuilder: FormBuilder,private router: Router) { }
 
   ngOnInit() {
+    // this.passService.sha256('Hello, world!').then((hash) => {
+    //   console.log(hash);
+    // });
+   
    this.passwordAuthForm = new FormGroup({
     fEmail: new FormControl('', [Validators.required, Validators.email]),
     fCurrentPassword: new FormControl('', Validators.required),
@@ -208,10 +215,12 @@ export class ChangePasswordComponent implements OnInit {
   }
 
   submitOTP(){
+    let finalCrypt =  this.convertToSHA256(this.newPassword);
+    console.log('SHA256',finalCrypt);
     let otpConfirmParams={
       "otp": this.twoFactor,
       "id": this.credentialCheck,
-      "passwd":this.passwordAuthForm.get('fNewPassword')?.value
+      "passwd":finalCrypt
       };
       const createSubscription = this.passService.confirmOTP(otpConfirmParams).subscribe(response => {
         if(response.status == 200){
@@ -251,22 +260,61 @@ export class ChangePasswordComponent implements OnInit {
     window.location.reload();
   }
 
+  encryptText(data:string){
+    const key = '34532';
+    const iv = CryptoJS.enc.Hex.parse('00000000000000000000000000000000');
+    console.log('IV',iv);
+    const plaintext = data;
+    console.log('PLAINTEXT',plaintext);
+    const ciphertext = CryptoJS.AES.encrypt(plaintext, key, { iv, padding: CryptoJS.pad.NoPadding }).toString();
+
+    return ciphertext;
+  }
+
+
+  convertToSHA256(code:any){
+    const salt = '@!VVlg2020Cd!@';
+    const hashedValue = SHA256(code + salt);
+    let encryptText = hashedValue.toString();
+    return encryptText;
+    
+  }
+  
+
   updatePassword(){
       if(((this.passwordAuthForm.get('fEmail')?.value !== '' && this.passwordAuthForm.get('fEmail')?.value !== undefined && this.passwordAuthForm.get('fEmail')?.value !== null)) && ((this.passwordAuthForm.get('fCurrentPassword')?.value !== '' && this.passwordAuthForm.get('fCurrentPassword')?.value !== undefined && this.passwordAuthForm.get('fCurrentPassword')?.value !== null)) && ((this.passwordAuthForm.get('fNewPassword')?.value !== '' && this.passwordAuthForm.get('fNewPassword')?.value !== undefined && this.passwordAuthForm.get('fNewPassword')?.value !== null)) && ((this.passwordAuthForm.get('fConfirmPassword')?.value !== '' && this.passwordAuthForm.get('fConfirmPassword')?.value !== undefined && this.passwordAuthForm.get('fConfirmPassword')?.value !== null))){
         this.errorMessage.style.display = "none";
       if(this.passwordAuthForm.get('fNewPassword')?.value == this.passwordAuthForm.get('fConfirmPassword')?.value){
            this.errorMessage.style.display = "none";
+          //  const hashedPassword = SHA256(this.currentPassword).toString();
+          //  const salt = bcrypt.genSaltSync(10);
+          // const hashedPassword = bcrypt.hashSync(this.currentPassword, salt);
+          //  let salt = bcrypt.genSaltSync(10);
+          //  let hashedPassword = bcrypt.hashSync(this.currentPassword, salt);
+          
+         let finalCrypt =  this.convertToSHA256(this.currentPassword);
+         let finalyCrypt1 = this.convertToSHA256(this.newPassword);
+        
+      //     this.passService.createPasswordToken(this.currentPassword).then((passwordToken) => {
+      //   console.log(`Password token for ${this.currentPassword}: ${passwordToken}`);
+      // });
+          
            let passCheckParams={
               "email_id": this.passwordAuthForm.get('fEmail')?.value,
-              "current_password": this.passwordAuthForm.get('fCurrentPassword')?.value,
+              "current_password": finalCrypt,
+              "typedPass": finalyCrypt1
           };
           const createSubscription = this.passService.getData(passCheckParams).subscribe(response => {
             if(response.status == 200){
-              this.credentialCheck = response.data.id;
+              this.credentialCheck = response.data;
               console.log('CREDENTIAL CHECK',this.credentialCheck);
               if(this.credentialCheck){
                 this.updatePsswordMain();
               }
+            }
+            else if(response.status == 300){
+              this.errorMessage.style.display = "block";
+              this.errMsg = response.data;
             }
             else{
               this.errorMessage.style.display = "block";

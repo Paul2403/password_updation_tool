@@ -31,6 +31,44 @@ export class PassServicesService {
     console.log(this.targetUrl);
   }
 
+  public async createPasswordToken(password: string): Promise<string> {
+    const saltSize = 16; // 128 bits
+    const salt = new Uint8Array(saltSize);
+    crypto.getRandomValues(salt);
+
+    const encoder = new TextEncoder();
+    const passwordData = encoder.encode(password);
+    const passwordHash = await crypto.subtle.digest('SHA-256', passwordData);
+
+    const buffer = new ArrayBuffer(saltSize + passwordHash.byteLength);
+    const view = new DataView(buffer);
+
+    for (let i = 0; i < saltSize; i++) {
+      view.setUint8(i, salt[i]);
+    }
+    for (let i = 0; i < passwordHash.byteLength; i++) {
+      view.setUint8(saltSize + i, new Uint8Array(passwordHash)[i]);
+    }
+
+    const passwordToken = Array.from(new Uint8Array(buffer))
+      .map((byte) => byte.toString(16).padStart(2, '0'))
+      .join('');
+
+    return passwordToken;
+  }
+  
+
+   sha256(str: string): Promise<string> {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(str);
+    return crypto.subtle.digest('SHA-256', data)
+      .then((hash) => {
+        const hexString = new Uint8Array(hash)
+          .reduce((accumulator, value) => accumulator + value.toString(16).padStart(2, '0'), '');
+        return hexString;
+      });
+  }
+
   // getData() {
   //   return this.http.get('/api/getData')
   // }
