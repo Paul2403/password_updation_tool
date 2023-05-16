@@ -26,6 +26,9 @@ export class ChangePasswordComponent implements OnInit {
   public weakPasswords:any;
   public credentialCheck:any;
   public twoFaModel:any=true;
+  public timetoCrack:any='Instantly';
+  public timetoCrackColor:any='red';
+  public showTimetoCrack:boolean = true;
   
   private subscriptionCollection: Subscription = new Subscription();
  
@@ -62,7 +65,8 @@ export class ChangePasswordComponent implements OnInit {
     // this.passService.sha256('Hello, world!').then((hash) => {
     //   console.log(hash);
     // });
-   
+    this.timetoCrack='Instantly';
+    this.timetoCrackColor = 'red';
    this.passwordAuthForm = new FormGroup({
     fEmail: new FormControl('', [Validators.required, Validators.email]),
     fCurrentPassword: new FormControl('', Validators.required),
@@ -349,6 +353,288 @@ export class ChangePasswordComponent implements OnInit {
   
   }
 
+  getStyleObject(timetoCrack: string): object {
+    if (timetoCrack === 'red') {
+      return { color: 'red' };
+    } else if (timetoCrack === 'orange') {
+      return { color: 'orange' };
+    } else if (timetoCrack === 'yellow') {
+      return { color: 'yellow' };
+    } else if (timetoCrack === 'green') {
+      return { color: 'green' };
+    } else {
+      return {}; // Return an empty object if none of the conditions match
+    }
+  }
+
+  timeToCrackPassword1(value:any){
+    if(this.hasNumbers(value) == true && this.hasUppercase(value) == true && this.hasLowercase(value)==true && this.hasSpecialCharacters(value)==true){
+      if(this.newPassword.length < 6){
+        this.timetoCrack='Instantly';
+        this.timetoCrackColor = 'red';
+      }
+      else if(this.newPassword.length == 6){
+        this.timetoCrack='5 secs';
+        this.timetoCrackColor = 'red';
+      }
+      else if(this.newPassword.length == 7){
+        this.timetoCrack='6 min';
+        this.timetoCrackColor = 'red';
+      }
+      else if(this.newPassword.length == 8){
+        this.timetoCrack='8 hours';
+        this.timetoCrackColor = 'red';
+      }
+      else if(this.newPassword.length == 9){
+        this.timetoCrack='3 weeks';
+        this.timetoCrackColor = 'orange';
+      }
+      else if(this.newPassword.length == 10){
+        this.timetoCrack='5 years';
+        this.timetoCrackColor = 'orange';
+      }
+      else if(this.newPassword.length == 11){
+        this.timetoCrack='400 years';
+        this.timetoCrackColor = 'yellow';
+      }
+      else if(this.newPassword.length == 12){
+        this.timetoCrack='34k years';
+        this.timetoCrackColor = 'yellow';
+      }
+      else if(this.newPassword.length == 13){
+        this.timetoCrack='2m years';
+        this.timetoCrackColor = 'green';
+      }
+      else if(this.newPassword.length == 14){
+        this.timetoCrack='200m years';
+        this.timetoCrackColor = 'green';
+      }
+      else if(this.newPassword.length == 15){
+        this.timetoCrack='15bn years';
+        this.timetoCrackColor = 'green';
+      }
+      else if(this.newPassword.length == 16){
+        this.timetoCrack='1tn years';
+        this.timetoCrackColor = 'green';
+      }
+      else if(this.newPassword.length == 17){
+        this.timetoCrack='93tn years';
+        this.timetoCrackColor = 'green';
+      }
+      else{
+        this.timetoCrack='7qd years';
+        this.timetoCrackColor = 'green';
+      }
+    }
+    else if(this.hasNumbers(value) == true && this.hasUppercase(value) == true && this.hasLowercase(value)==true){
+      if(this.newPassword.length < 6){
+        this.timetoCrack='Instantly';
+        this.timetoCrackColor = 'red';
+      }
+      else if(this.newPassword.length == 6){
+        this.timetoCrack='1 sec';
+        this.timetoCrackColor = 'red';
+      }
+      else if(this.newPassword.length == 7){
+        this.timetoCrack='1 min';
+        this.timetoCrackColor = 'red';
+      }
+      else if(this.newPassword.length == 8){
+        this.timetoCrack='1 hour';
+        this.timetoCrackColor = 'red';
+      }
+      else if(this.newPassword.length == 9){
+        this.timetoCrack='3 days';
+        this.timetoCrackColor = 'orange';
+      }
+      else if(this.newPassword.length == 10){
+        this.timetoCrack='7 months';
+        this.timetoCrackColor = 'orange';
+      }
+      else if(this.newPassword.length == 11){
+        this.timetoCrack='41 years';
+        this.timetoCrackColor = 'yellow';
+      }
+      else if(this.newPassword.length == 12){
+        this.timetoCrack='2k years';
+        this.timetoCrackColor = 'yellow';
+      }
+      else if(this.newPassword.length == 13){
+        this.timetoCrack='100k years';
+        this.timetoCrackColor = 'yellow';
+      }
+      else if(this.newPassword.length == 14){
+        this.timetoCrack='9m years';
+        this.timetoCrackColor = 'green';
+      }
+      else if(this.newPassword.length == 15){
+        this.timetoCrack='600m years';
+        this.timetoCrackColor = 'green';
+      }
+      else if(this.newPassword.length == 16){
+        this.timetoCrack='37bn years';
+        this.timetoCrackColor = 'green';
+      }
+      else if(this.newPassword.length == 17){
+        this.timetoCrack='2tn years';
+        this.timetoCrackColor = 'green';
+      }
+      else{
+        this.timetoCrack='100tn years';
+        this.timetoCrackColor = 'green';
+      }
+    }
+    else if(this.hasUppercase(value) == true && this.hasLowercase(value)==true){
+      if(this.newPassword.length < 7){
+        this.timetoCrack='Instantly';
+        this.timetoCrackColor = 'red';
+      }
+      else if(this.newPassword.length == 7){
+        this.timetoCrack='25 secs';
+        this.timetoCrackColor = 'red';
+      }
+      else if(this.newPassword.length == 8){
+        this.timetoCrack='22 mins';
+        this.timetoCrackColor = 'red';
+      }
+      else if(this.newPassword.length == 9){
+        this.timetoCrack='19 hours';
+        this.timetoCrackColor = 'red';
+      }
+      else if(this.newPassword.length == 10){
+        this.timetoCrack='1 month';
+        this.timetoCrackColor = 'orange';
+      }
+      else if(this.newPassword.length == 11){
+        this.timetoCrack='5 years';
+        this.timetoCrackColor = 'orange';
+      }
+      else if(this.newPassword.length == 12){
+        this.timetoCrack='300 years';
+        this.timetoCrackColor = 'yellow';
+      }
+      else if(this.newPassword.length == 13){
+        this.timetoCrack='16k years';
+        this.timetoCrackColor = 'yellow';
+      }
+      else if(this.newPassword.length == 14){
+        this.timetoCrack='800k years';
+        this.timetoCrackColor = 'yellow';
+      }
+      else if(this.newPassword.length == 15){
+        this.timetoCrack='43m years';
+        this.timetoCrackColor = 'green';
+      }
+      else if(this.newPassword.length == 16){
+        this.timetoCrack='2bn years';
+        this.timetoCrackColor = 'green';
+      }
+      else if(this.newPassword.length == 17){
+        this.timetoCrack='100bn years';
+        this.timetoCrackColor = 'green';
+      }
+      else{
+        this.timetoCrack='6tn years';
+        this.timetoCrackColor = 'green';
+      }
+    }
+    else if(this.hasNumbers(value) == true){
+      if(this.newPassword.length<11){
+        this.timetoCrack='Instantly';
+        this.timetoCrackColor = 'red';
+      }
+      else if (this.newPassword.length==11){
+        this.timetoCrack='2 secs';
+        this.timetoCrackColor = 'red';
+      }
+      else if (this.newPassword.length == 12){
+        this.timetoCrack='25 secs';
+        this.timetoCrackColor = 'red';
+      }
+      else if(this.newPassword.length == 13){
+        this.timetoCrack='4 mins';
+        this.timetoCrackColor = 'red';
+      }
+      else if(this.newPassword.length == 14){
+        this.timetoCrack='41 mins';
+        this.timetoCrackColor = 'red';
+      }
+      else if(this.newPassword.length == 15){
+        this.timetoCrack='6 hours';
+        this.timetoCrackColor = 'red';
+      }
+      else if(this.newPassword.length == 16){
+        this.timetoCrack='2 days';
+        this.timetoCrackColor = 'orange';
+      }
+      else if(this.newPassword.length == 17){
+        this.timetoCrack='4 weeks';
+        this.timetoCrackColor = 'orange';
+      }
+      else{
+        this.timetoCrack='9 months';
+        this.timetoCrackColor = 'orange';
+      }
+    }
+    else if(this.hasLowercase(value)==true){
+      if(this.newPassword.length < 8){
+        this.timetoCrack='Instantly';
+        this.timetoCrackColor = 'red';
+      }
+      else if(this.newPassword.length == 8){
+        this.timetoCrack='5 secs';
+        this.timetoCrackColor = 'red';
+      }
+      else if(this.newPassword.length == 9){
+        this.timetoCrack='2 mins';
+        this.timetoCrackColor = 'red';
+      }
+      else if(this.newPassword.length == 10){
+        this.timetoCrack='58 mins';
+        this.timetoCrackColor = 'red';
+      }
+      else if(this.newPassword.length == 11){
+        this.timetoCrack='1 day';
+        this.timetoCrackColor = 'orange';
+      }
+      else if(this.newPassword.length == 12){
+        this.timetoCrack='3 weeks';
+        this.timetoCrackColor = 'orange';
+      }
+      else if(this.newPassword.length == 13){
+        this.timetoCrack='1 year';
+        this.timetoCrackColor = 'orange';
+      }
+      else if(this.newPassword.length == 14){
+        this.timetoCrack='51 years';
+        this.timetoCrackColor = 'yellow';
+      }
+      else if(this.newPassword.length == 15){
+        this.timetoCrack='1k years';
+        this.timetoCrackColor = 'yellow';
+      }
+      else if(this.newPassword.length == 16){
+        this.timetoCrack='34 years';
+        this.timetoCrackColor = 'yellow';
+      }
+      else if(this.newPassword.length == 17){
+        this.timetoCrack='800k years';
+        this.timetoCrackColor = 'yellow';
+      }
+      else{
+        this.timetoCrack='23m years';
+        this.timetoCrackColor = 'green';
+      }
+    }
+    else{
+      this.timetoCrack='Instantly';
+      this.timetoCrackColor = 'red';
+    }
+    
+   
+    
+  }
+
   showPasswordStrength(object:any) {
     let point = 0;
     let value = this.newPassword;
@@ -357,20 +643,6 @@ export class ChangePasswordComponent implements OnInit {
     let widthPower = ['1%', '25%', '50%', '75%', '100%'];
     let colorPower = ['#D73F40', '#DC6551', '#F2B84F', '30CEC7','#BDE952'];
 
-    // if(value.length >= 10){
-    //     let arrayTest = [
-    //         /[0-9]/,
-    //         /[a-z]/,
-    //         /[A-Z]/,
-    //         /[^0-9a-zA-Z]/
-    //     ];
-  
-
-        // arrayTest.forEach(item => {
-        //     if(item.test(value)){
-        //         point += 1;
-        //     }
-        // });
         if(this.hasUppercase(object) == true){
           if(this.hasLowercase(object) == true){
             point += 1;
@@ -424,9 +696,48 @@ export class ChangePasswordComponent implements OnInit {
       else{
           this.special.style.color = '#5b6262';
       }
-  
-  this.commonPasswordCheck(object);
 
+      this.timeToCrackPassword1(this.newPassword);
+    //  this.timetoCrack= this.timeToCrackPassword1(this.newPassword);
+  
+      this.commonPasswordCheck(object);
+
+    
+  }
+
+  timeToCrackPassword(password:any){
+    
+      const characterPool = {
+        lowercase: 26,
+        uppercase: 26,
+        numbers: 10,
+        symbols: 33
+      };
+    
+      let possibleCharacters = 0;
+    
+      if (/[a-z]/.test(password)) {
+        possibleCharacters += characterPool.lowercase;
+      }
+      if (/[A-Z]/.test(password)) {
+        possibleCharacters += characterPool.uppercase;
+      }
+      if (/[0-9]/.test(password)) {
+        possibleCharacters += characterPool.numbers;
+      }
+      if (/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?~]/.test(password)) {
+        possibleCharacters += characterPool.symbols;
+      }
+    
+      const passwordLength = password.length;
+      const possibleCombinations = Math.pow(possibleCharacters, passwordLength);
+      const timeToCrack = possibleCombinations / (2e9 * 3600); // Assuming 2 billion (2e9) password attempts per second
+    
+    
+      
+       return timeToCrack.toFixed(2) + ' hours'; // Estimated time to crack in hours
+    
+    
     
   }
 
