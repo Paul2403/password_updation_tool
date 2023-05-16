@@ -353,19 +353,19 @@ export class ChangePasswordComponent implements OnInit {
   
   }
 
-  getStyleObject(timetoCrack: string): object {
-    if (timetoCrack === 'red') {
-      return { color: 'red' };
-    } else if (timetoCrack === 'orange') {
-      return { color: 'orange' };
-    } else if (timetoCrack === 'yellow') {
-      return { color: 'yellow' };
-    } else if (timetoCrack === 'green') {
-      return { color: 'green' };
-    } else {
-      return {}; // Return an empty object if none of the conditions match
+  generatePassword(){
+    const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+[]{}|;:,.<>?';
+    let passLength = 15
+    let password = '';
+    for (let i = 0; i < passLength; i++) {
+      const randomIndex = Math.floor(Math.random() * charset.length);
+      password += charset[randomIndex];
     }
+    this.newPassword = password;
+    
   }
+
+  
 
   timeToCrackPassword1(value:any){
     if(this.hasNumbers(value) == true && this.hasUppercase(value) == true && this.hasLowercase(value)==true && this.hasSpecialCharacters(value)==true){
@@ -806,6 +806,8 @@ export class ChangePasswordComponent implements OnInit {
   }
   if(errorDetected>0){
       this.commonpsswd.style.color = '#fb2035';
+      this.timetoCrack='Instantly';
+      this.timetoCrackColor = 'red';
     }
     else{
       this.commonpsswd.style.color = '#5b6262';
