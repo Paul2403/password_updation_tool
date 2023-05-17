@@ -3,4 +3,18 @@ body, html {
     height: 100%;
     padding: 0;
     margin: 0;
+    overflow: hidden;
+    scrollbar-width: none;
+    overflow-y: hidden;
+    scrollbar-width: thin;
 }
+
+body::-webkit-scrollbar {
+    width: 0.1px;
+    background-color: transparent;
+  }
+
+  body::-webkit-scrollbar {
+    width: 0.1px;
+    background-color: transparent;
+  }
