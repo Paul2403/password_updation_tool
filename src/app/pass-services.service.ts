@@ -24,11 +24,9 @@ export class PassServicesService {
   }
 
   trimUrl(){
-    console.log('BASECONFIG',this._baseConfig);
     this.originalString = "http://localhost:4200/'http://localhost:3000'/user/login";
     this.url = new URL(this.originalString);
     this.targetUrl = this.url.pathname.slice(1);
-    console.log(this.targetUrl);
   }
 
   public async createPasswordToken(password: string): Promise<string> {
@@ -69,25 +67,7 @@ export class PassServicesService {
       });
   }
 
-  // getData() {
-  //   return this.http.get('/api/getData')
-  // }
 
-  // public getData(data: any): Observable<any> {
-  //   return this.http.post<Boolean>(`http://localhost:3000/user/login`, data, {
-  //     observe: 'response',
-  //   }).pipe(
-  //     map(res => {
-  //       console.log(res['body']);
-  //       return res['body'];
-  //     }),
-  //     catchError((e: any) => {
-
-  //       return throwError(e)
-  //     })
-  //   )
-
-  // }
 
   public getData(data: any): Observable<any> {
     return this.http.post(`http://localhost:3000/user/login`, data, {

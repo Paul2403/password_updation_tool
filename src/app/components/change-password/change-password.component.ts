@@ -46,6 +46,8 @@ export class ChangePasswordComponent implements OnInit {
   headMsg:any='Two-Factor Authentication'
   errorMessage:any='';
   commonpsswd:any='';
+
+  //Form Validation for the Page
   public passwordAuthForm = new FormGroup({
     fEmail: new FormControl('', [Validators.required, Validators.email]),
     fCurrentPassword: new FormControl('', Validators.required),
@@ -53,6 +55,7 @@ export class ChangePasswordComponent implements OnInit {
     fConfirmPassword: new FormControl('', Validators.required)
   });
 
+  //Form Validation for the OTP Form
   public tfA = new FormGroup({
     ftfA: new FormControl('',Validators.required)
   })
@@ -62,18 +65,19 @@ export class ChangePasswordComponent implements OnInit {
   constructor(private passService: PassServicesService,public formBuilder: FormBuilder,private router: Router) { }
 
   ngOnInit() {
-    // this.passService.sha256('Hello, world!').then((hash) => {
-    //   console.log(hash);
-    // });
+    //Password Crack time initial values
     this.timetoCrack='Instantly';
     this.timetoCrackColor = 'red';
-   this.passwordAuthForm = new FormGroup({
+
+    //Form Validation for the Page
+    this.passwordAuthForm = new FormGroup({
     fEmail: new FormControl('', [Validators.required, Validators.email]),
     fCurrentPassword: new FormControl('', Validators.required),
     fNewPassword: new FormControl(''),
     fConfirmPassword: new FormControl('', Validators.required)
   });
    
+    //HTML Elements are being stored as variables
     this.power = document.querySelector('#power-point');
     this.char = document.querySelector('#charNum');
     this.upperCount = document.querySelector('#upper_count');
@@ -83,10 +87,13 @@ export class ChangePasswordComponent implements OnInit {
     this.commonpsswd=document.querySelector('#common_passwd');
     this.errorMessage=document.querySelector('#banner');
     this.twoFaModel= false;
+
+    //Initally we are fetching the common passwords from the database
     this.getWeakPasswords();
  
   }
 
+  //Function to get the weak passwords from the database
   getWeakPasswords(){
       let params = {
 
@@ -96,7 +103,7 @@ export class ChangePasswordComponent implements OnInit {
             this.weakPasswords = response.data;
         }
         else{
-          console.log(response);
+          // console.log(response);
         }
       }, err => {
         console.log('error', err);
@@ -105,6 +112,8 @@ export class ChangePasswordComponent implements OnInit {
       this.subscriptionCollection.add(createSubscription);
   }
 
+
+  //Function to send OTP 
   updatePsswordMain(){
     this.headMsg='Two-Factor Authentication';
     this.twoFactor='';
@@ -116,15 +125,6 @@ export class ChangePasswordComponent implements OnInit {
       
       };
       const createSubscription = this.passService.sendOTP(otpParams).subscribe(response => {
-        // if(response.status == 200){
-        //   this.credentialCheck = response.data.id;
-        //   if(this.credentialCheck){
-        //     this.updatePsswordMain();
-        //   }
-        // }
-        // else{
-  
-        // }
       }, err => {
         console.log('error', err);
       
@@ -132,9 +132,10 @@ export class ChangePasswordComponent implements OnInit {
       this.subscriptionCollection.add(createSubscription);
   }
 
+
+  //Final function to submit the given recieved OTP and update the password of the user
   submitOTP(){
     let finalCrypt =  this.convertToSHA256(this.newPassword);
-    console.log('SHA256',finalCrypt);
     let otpConfirmParams={
       "otp": this.twoFactor,
       "id": this.credentialCheck,
@@ -158,15 +159,6 @@ export class ChangePasswordComponent implements OnInit {
           this.optExpired=false;
           this.validOTP=false;
         }
-        // if(response.status == 200){
-        //   this.credentialCheck = response.data.id;
-        //   if(this.credentialCheck){
-        //     this.updatePsswordMain();
-        //   }
-        // }
-        // else{
-  
-        // }
       }, err => {
         console.log('error', err);
       
@@ -174,22 +166,21 @@ export class ChangePasswordComponent implements OnInit {
       this.subscriptionCollection.add(createSubscription);
   }
 
+  //Function to refresh the page after each updation happens
   goToHomePage(){
     window.location.reload();
   }
 
+  //Hashing the Password
   encryptText(data:string){
     const key = '34532';
     const iv = CryptoJS.enc.Hex.parse('00000000000000000000000000000000');
-    console.log('IV',iv);
     const plaintext = data;
-    console.log('PLAINTEXT',plaintext);
     const ciphertext = CryptoJS.AES.encrypt(plaintext, key, { iv, padding: CryptoJS.pad.NoPadding }).toString();
-
     return ciphertext;
   }
 
-
+  //Converting the password to SHA256 Hash code
   convertToSHA256(code:any){
     const salt = '@!VVlg2020Cd!@';
     const hashedValue = SHA256(code + salt);
@@ -198,25 +189,14 @@ export class ChangePasswordComponent implements OnInit {
     
   }
   
-
+  //The Function call to check if password already exists, if its already used password among the last 5 passwords and to send the OTP
   updatePassword(){
       if(((this.passwordAuthForm.get('fEmail')?.value !== '' && this.passwordAuthForm.get('fEmail')?.value !== undefined && this.passwordAuthForm.get('fEmail')?.value !== null)) && ((this.passwordAuthForm.get('fCurrentPassword')?.value !== '' && this.passwordAuthForm.get('fCurrentPassword')?.value !== undefined && this.passwordAuthForm.get('fCurrentPassword')?.value !== null)) && ((this.passwordAuthForm.get('fNewPassword')?.value !== '' && this.passwordAuthForm.get('fNewPassword')?.value !== undefined && this.passwordAuthForm.get('fNewPassword')?.value !== null)) && ((this.passwordAuthForm.get('fConfirmPassword')?.value !== '' && this.passwordAuthForm.get('fConfirmPassword')?.value !== undefined && this.passwordAuthForm.get('fConfirmPassword')?.value !== null))){
         this.errorMessage.style.display = "none";
       if(this.passwordAuthForm.get('fNewPassword')?.value == this.passwordAuthForm.get('fConfirmPassword')?.value){
            this.errorMessage.style.display = "none";
-          //  const hashedPassword = SHA256(this.currentPassword).toString();
-          //  const salt = bcrypt.genSaltSync(10);
-          // const hashedPassword = bcrypt.hashSync(this.currentPassword, salt);
-          //  let salt = bcrypt.genSaltSync(10);
-          //  let hashedPassword = bcrypt.hashSync(this.currentPassword, salt);
-          
          let finalCrypt =  this.convertToSHA256(this.currentPassword);
          let finalyCrypt1 = this.convertToSHA256(this.newPassword);
-        
-      //     this.passService.createPasswordToken(this.currentPassword).then((passwordToken) => {
-      //   console.log(`Password token for ${this.currentPassword}: ${passwordToken}`);
-      // });
-          
            let passCheckParams={
               "email_id": this.passwordAuthForm.get('fEmail')?.value,
               "current_password": finalCrypt,
@@ -225,7 +205,6 @@ export class ChangePasswordComponent implements OnInit {
           const createSubscription = this.passService.getData(passCheckParams).subscribe(response => {
             if(response.status == 200){
               this.credentialCheck = response.data;
-              console.log('CREDENTIAL CHECK',this.credentialCheck);
               if(this.credentialCheck){
                 this.updatePsswordMain();
               }
@@ -253,20 +232,9 @@ export class ChangePasswordComponent implements OnInit {
         this.errorMessage.style.display = "block";
         this.errMsg = 'Please Enter All Fields!';
       }
-
-
-
-   
-
-
-    // this.service.getData().subscribe((response) => {
-    //   console.log('Response from API is ', response)
-    // }, (error)=>{
-    //   console.log('Error is ', error);
-    // })
-  
   }
 
+  //Random Password Generator
   generatePassword(){
     const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+[]{}|;:,.<>?';
     let passLength = 15
@@ -280,8 +248,9 @@ export class ChangePasswordComponent implements OnInit {
   }
 
   
-
+  //Function to calculate the time to crack the password
   timeToCrackPassword1(value:any){
+    //condition to check if the password has numbers, uppercase, lowercase and symbols
     if(this.hasNumbers(value) == true && this.hasUppercase(value) == true && this.hasLowercase(value)==true && this.hasSpecialCharacters(value)==true){
       if(this.newPassword.length < 6){
         this.timetoCrack='Instantly';
@@ -340,6 +309,7 @@ export class ChangePasswordComponent implements OnInit {
         this.timetoCrackColor = 'green';
       }
     }
+    //condition to check if the password has numbers, uppercase and lowercase 
     else if(this.hasNumbers(value) == true && this.hasUppercase(value) == true && this.hasLowercase(value)==true){
       if(this.newPassword.length < 6){
         this.timetoCrack='Instantly';
@@ -398,6 +368,7 @@ export class ChangePasswordComponent implements OnInit {
         this.timetoCrackColor = 'green';
       }
     }
+    //condition to check if the password has uppercase and lowercase 
     else if(this.hasUppercase(value) == true && this.hasLowercase(value)==true){
       if(this.newPassword.length < 7){
         this.timetoCrack='Instantly';
@@ -452,6 +423,7 @@ export class ChangePasswordComponent implements OnInit {
         this.timetoCrackColor = 'green';
       }
     }
+    //condition to check if the password has numbers
     else if(this.hasNumbers(value) == true){
       if(this.newPassword.length<11){
         this.timetoCrack='Instantly';
@@ -490,6 +462,7 @@ export class ChangePasswordComponent implements OnInit {
         this.timetoCrackColor = 'orange';
       }
     }
+    //condition to check if the password has lowercase 
     else if(this.hasLowercase(value)==true){
       if(this.newPassword.length < 8){
         this.timetoCrack='Instantly';
@@ -544,11 +517,9 @@ export class ChangePasswordComponent implements OnInit {
       this.timetoCrack='Instantly';
       this.timetoCrackColor = 'red';
     }
-    
-   
-    
   }
 
+  //Function to calculate the password strength
   showPasswordStrength(object:any) {
     let point = 0;
     let value = this.newPassword;
@@ -571,7 +542,6 @@ export class ChangePasswordComponent implements OnInit {
         if(value.length>=10){
           point += 1;
         }
-    // }
 
     this.power.style.width = widthPower[point];
     this.power.style.backgroundColor = colorPower[point];
@@ -612,13 +582,10 @@ export class ChangePasswordComponent implements OnInit {
       }
 
       this.timeToCrackPassword1(this.newPassword);
-    //  this.timetoCrack= this.timeToCrackPassword1(this.newPassword);
-  
       this.commonPasswordCheck(object);
-
-    
   }
 
+//function call to calculate the time to crack the password
   timeToCrackPassword(password:any){
     
       const characterPool = {
@@ -650,13 +617,11 @@ export class ChangePasswordComponent implements OnInit {
     
       
        return timeToCrack.toFixed(2) + ' hours'; // Estimated time to crack in hours
-    
-    
-    
   }
 
+
+  //function to count the characters in the string
   countChars(obj:any) {
-   console.log('OBJECT',obj);
    this.showPasswordStrength(obj);
   }
   
@@ -676,12 +641,12 @@ export class ChangePasswordComponent implements OnInit {
     return /[^0-9a-zA-Z]/.test(str);
   }
   
+  //Function call to compare if the typed password is similar to the common password fetched from the database
   commonPasswordCheck(obj: any) {
     let point = 0;
     let value = this.newPassword;
     let widthPower = ['1%', '25%', '50%', '75%', '100%'];
     let colorPower = ['#D73F40', '#DC6551', '#F2B84F', '30CEC7','#BDE952'];
-    // var errorMessage = document.getElementById("banner");
     let errorDetected = 0;
     if(this.hasUppercase(obj) == true){
       if(this.hasLowercase(obj) == true){
@@ -697,19 +662,6 @@ export class ChangePasswordComponent implements OnInit {
     if(value.length>=10){
       point += 1;
     }
-    //     if(value.length >= 10){
-    //     let arrayTest = [
-    //         /[0-9]/,
-    //         /[a-z]/,
-    //         /[A-Z]/,
-    //         /[^0-9a-zA-Z]/
-    //     ];
-    //     arrayTest.forEach(item => {
-    //       if(item.test(value)){
-    //           point += 1;
-    //       }
-    //   });
-    // }
     for (const pwd of this.weakPasswords) {
       if (obj == pwd.passwd){
           point = 0;
@@ -727,12 +679,9 @@ export class ChangePasswordComponent implements OnInit {
       this.commonpsswd.style.color = '#5b6262';
     }
   }
-  // else{
-  //     // this.errorMessage.style.display = "none";
-  // }
-  
 
 
+  //Function call to show and hide password on the text field
   togglePasswordType(passType: any){
       if(passType==1){
         this.showCurrentPassword = !this.showCurrentPassword;
@@ -745,8 +694,6 @@ export class ChangePasswordComponent implements OnInit {
       }
   }
 
-  // verifyIfEqual(){
-  //   if()
-  // }
+
 
 }
