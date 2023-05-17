@@ -9,6 +9,7 @@ import { AppComponent } from './app.component';
 import { ChangePasswordComponent } from './components/change-password/change-password.component';
 import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
+import {TooltipModule} from 'primeng/tooltip';
 
 
 
@@ -20,6 +21,7 @@ import { ButtonModule } from 'primeng/button';
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
+    TooltipModule,
     HttpClientModule,
     AppRoutingModule,
     FormsModule,

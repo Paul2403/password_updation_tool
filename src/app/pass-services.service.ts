@@ -102,6 +102,19 @@ export class PassServicesService {
     )
   }
 
+  public getWeakPasswords(data: any): Observable<any> {
+    return this.http.post(`http://localhost:3000/user/common-passwords`, data, {
+      observe: 'response'
+    }).pipe(
+      map(res => {
+        return res.body;
+      }),
+      catchError((e: any) => {
+        return throwError(e)
+      })
+    )
+  }
+
   public sendOTP(data: any): Observable<any> {
     return this.http.post(`http://localhost:3000/user/otp`, data, {
       observe: 'response'

@@ -83,6 +83,7 @@ export class ChangePasswordComponent implements OnInit {
     this.commonpsswd=document.querySelector('#common_passwd');
     this.errorMessage=document.querySelector('#banner');
     this.twoFaModel= false;
+    // this.getWeakPasswords();
     this.weakPasswords = [
       "Password1!",
       "Helloworld123!",
