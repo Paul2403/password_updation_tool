@@ -83,113 +83,26 @@ export class ChangePasswordComponent implements OnInit {
     this.commonpsswd=document.querySelector('#common_passwd');
     this.errorMessage=document.querySelector('#banner');
     this.twoFaModel= false;
-    // this.getWeakPasswords();
-    this.weakPasswords = [
-      "Password1!",
-      "Helloworld123!",
-      "Qwerty1!",
-      "P@ssw0rd",
-      "Summer2021!",
-      "Welcome1!",
-      "Abc123!",
-      "Football1!",
-      "123456!",
-      "Pa$$w0rd",
-      "Letmein1!",
-      "Hello123!",
-      "Monkey1!",
-      "Helloworld!23",
-      "Dragon1!",
-      "Starwars1!",
-      "Batman1!",
-      "Liverpool1!",
-      "Superman1!",
-      "Iloveyou1!",
-      "Helloworld1!",
-      "Winter2022!",
-      "Password1",
-    "Qwerty123",
-    "Abc123456",
-    "P@ssword1",
-    "123456789a",
-    "Welcome1",
-    "Iloveyou1",
-    "1234Abcd",
-    "Password12",
-    "Qwertyui1",
-    "Monkey12",
-    "Sunshine1",
-    "Baseball1",
-    "Football12",
-    "Starwars1",
-    "1234567aA",
-    "Admin1234",
-    "Football123",
-    "1234Qwer",
-    "Qwerty1234",
-    "123456Abc",
-    "Admin12345",
-    "Password1234",
-    "Letmein123",
-    "123456789b",
-    "Superman1",
-    "123456789c",
-    "Qwerty12345",
-    "1234567Aa",
-    "Letmein2018",
-    "123456789d",
-    "Trustno1",
-    "Football1234",
-    "Starwars123",
-    "123456789f",
-    "Qazwsx123",
-    "Welcome1234",
-    "1234567b",
-    "1234AbcdE",
-    "Letmein2019",
-    "12345678Ab",
-    "123456789i",
-    "12345Abcde",
-    "Admin123456",
-    "Password12345",
-    "Qwertyuiop123",
-    "123456f",
-    "12345Abcdef",
-    "Admin1234567",
-    "Qwerty123456",
-    "123456789j",
-    "12345AbcdEf",
-    "1234567Bb",
-    "Password1234567",
-    "Qwertyuiop1234",
-    "123456789k",
-    "12345Abcdefg",
-    "Pa$$w0rd!234",
-    "Admin12345678",
-    "Qwerty1234567",
-    "1234567Cc",
-    "12345AbcdEfg",
-    "Admin123456789",
-    "Qwertyuiop12345",
-    "123456789l",
-    "12345Abcdefgh",
-    "Admin1234567890",
-    "Qwerty12345678",
-    "1234567Dd",
-    "12345AbcdEfgh",
-    "Admin12345678910",
-    "Qwertyui123",
-    "123456789m",
-    "12345Abcdefghi",
-    "Admin1234567891",
-    "Qwerty12345678a",
-    "1234567Ee",
-    "12345AbcdEfghi",
-    "Admin12345678912",
-    "HellowWorld123!",
-    "Qwertyuiop123456",
-    "123456789n"
-    ];
+    this.getWeakPasswords();
+ 
+  }
+
+  getWeakPasswords(){
+      let params = {
+
+      };
+      const createSubscription = this.passService.getWeakPasswords(params).subscribe(response => {
+        if(response.status == 200){
+            this.weakPasswords = response.data;
+        }
+        else{
+          console.log(response);
+        }
+      }, err => {
+        console.log('error', err);
+      
+      });
+      this.subscriptionCollection.add(createSubscription);
   }
 
   updatePsswordMain(){
@@ -798,7 +711,7 @@ export class ChangePasswordComponent implements OnInit {
     //   });
     // }
     for (const pwd of this.weakPasswords) {
-      if (obj == pwd){
+      if (obj == pwd.passwd){
           point = 0;
           this.power.style.width = widthPower[point];
           this.power.style.backgroundColor = colorPower[point];
