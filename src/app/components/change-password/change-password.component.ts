@@ -6,12 +6,14 @@ import { Router } from '@angular/router';
 import { SHA256 } from 'crypto-js';
 import * as bcrypt from 'bcryptjs';
 import * as CryptoJS from 'crypto-js';
+import {MessageService} from 'primeng/api';
 
 
 @Component({
   selector: 'app-change-password',
   templateUrl: './change-password.component.html',
-  styleUrls: ['./change-password.component.scss']
+  styleUrls: ['./change-password.component.scss'],
+  providers: [MessageService]
 })
 export class ChangePasswordComponent implements OnInit {
 
@@ -62,7 +64,7 @@ export class ChangePasswordComponent implements OnInit {
 
   
 
-  constructor(private passService: PassServicesService,public formBuilder: FormBuilder,private router: Router) { }
+  constructor(private passService: PassServicesService,public formBuilder: FormBuilder,private router: Router,private messageService: MessageService) { }
 
   ngOnInit() {
     //Password Crack time initial values
@@ -194,43 +196,55 @@ export class ChangePasswordComponent implements OnInit {
       if(((this.passwordAuthForm.get('fEmail')?.value !== '' && this.passwordAuthForm.get('fEmail')?.value !== undefined && this.passwordAuthForm.get('fEmail')?.value !== null)) && ((this.passwordAuthForm.get('fCurrentPassword')?.value !== '' && this.passwordAuthForm.get('fCurrentPassword')?.value !== undefined && this.passwordAuthForm.get('fCurrentPassword')?.value !== null)) && ((this.passwordAuthForm.get('fNewPassword')?.value !== '' && this.passwordAuthForm.get('fNewPassword')?.value !== undefined && this.passwordAuthForm.get('fNewPassword')?.value !== null)) && ((this.passwordAuthForm.get('fConfirmPassword')?.value !== '' && this.passwordAuthForm.get('fConfirmPassword')?.value !== undefined && this.passwordAuthForm.get('fConfirmPassword')?.value !== null))){
         this.errorMessage.style.display = "none";
       if(this.passwordAuthForm.get('fNewPassword')?.value == this.passwordAuthForm.get('fConfirmPassword')?.value){
-           this.errorMessage.style.display = "none";
-         let finalCrypt =  this.convertToSHA256(this.currentPassword);
-         let finalyCrypt1 = this.convertToSHA256(this.newPassword);
-           let passCheckParams={
-              "email_id": this.passwordAuthForm.get('fEmail')?.value,
-              "current_password": finalCrypt,
-              "typedPass": finalyCrypt1
-          };
-          const createSubscription = this.passService.getData(passCheckParams).subscribe(response => {
-            if(response.status == 200){
-              this.credentialCheck = response.data;
-              if(this.credentialCheck){
-                this.updatePsswordMain();
-              }
-            }
-            else if(response.status == 300){
-              this.errorMessage.style.display = "block";
-              this.errMsg = response.data;
-            }
-            else{
-              this.errorMessage.style.display = "block";
-              this.errMsg = 'Ivalid Current Password!';
-            }
-          }, err => {
-            console.log('error', err);
+          if(this.newPassword.length >=10 && this.hasNumbers(this.newPassword)==true && this.hasUppercase(this.newPassword)==true && this.hasLowercase(this.newPassword)==true && this.hasSpecialCharacters(this.newPassword)==true){
+            this.errorMessage.style.display = "none";
+            let finalCrypt =  this.convertToSHA256(this.currentPassword);
+            let finalyCrypt1 = this.convertToSHA256(this.newPassword);
+              let passCheckParams={
+                 "email_id": this.passwordAuthForm.get('fEmail')?.value,
+                 "current_password": finalCrypt,
+                 "typedPass": finalyCrypt1
+             };
+             const createSubscription = this.passService.getData(passCheckParams).subscribe(response => {
+               if(response.status == 200){
+                 this.credentialCheck = response.data;
+                 if(this.credentialCheck){
+                   this.updatePsswordMain();
+                 }
+               }
+               else if(response.status == 300){
+                this.messageService.add({key: 'tc', severity:'error', summary: 'Error', detail: response.data});
+                //  this.errorMessage.style.display = "block";
+                //  this.errMsg = response.data;
+               }
+               else{
+                this.messageService.add({key: 'tc', severity:'error', summary: 'Error', detail: 'Ivalid Current Password!'});
+                //  this.errorMessage.style.display = "block";
+                //  this.errMsg = 'Ivalid Current Password!';
+               }
+             }, err => {
+               console.log('error', err);
+             
+             });
+             this.subscriptionCollection.add(createSubscription);
+          }
+          else{
+            this.messageService.add({key: 'tc', severity:'error', summary: 'Error', detail: 'Passwords must be atleast 10 characters, with a combination of Uppercase, Lowercase, Symbols and Numbers!'});
+            // this.errorMessage.style.display = "block";
+            // this.errMsg = 'Passwords must contain a combination of Uppercase, LowerCase, Symbols and Numbers!';
+          }
           
-          });
-          this.subscriptionCollection.add(createSubscription);
       }
       else{
-        this.errorMessage.style.display = "block";
-        this.errMsg = 'Passwords do not match!';
+        this.messageService.add({key: 'tc', severity:'error', summary: 'Error', detail: 'Passwords do not match!'});
+        // this.errorMessage.style.display = "block";
+        // this.errMsg = 'Passwords do not match!';
       }
       }
       else{
-        this.errorMessage.style.display = "block";
-        this.errMsg = 'Please Enter All Fields!';
+        this.messageService.add({key: 'tc', severity:'error', summary: 'Error', detail: 'Please Enter All Fields!'});
+        // this.errorMessage.style.display = "block";
+        // this.errMsg = 'Please Enter All Fields!';
       }
   }
 

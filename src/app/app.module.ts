@@ -11,6 +11,7 @@ import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
 import {TooltipModule} from 'primeng/tooltip';
 import {ScrollPanelModule} from 'primeng/scrollpanel';
+import {ToastModule} from 'primeng/toast';
 
 
 
@@ -29,7 +30,8 @@ import {ScrollPanelModule} from 'primeng/scrollpanel';
     FormsModule,
     ButtonModule,
     ReactiveFormsModule,
-    DialogModule
+    DialogModule,
+    ToastModule
   ],
   providers: [],
   bootstrap: [AppComponent]
