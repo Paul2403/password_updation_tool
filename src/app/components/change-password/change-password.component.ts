@@ -250,12 +250,23 @@ export class ChangePasswordComponent implements OnInit {
 
   //Random Password Generator
   generatePassword(){
+    // const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+[]{}|;:,.<>?';
+    // let passLength = 15
+    // let password = '';
+    // for (let i = 0; i < passLength; i++) {
+    //   const randomIndex = Math.floor(Math.random() * charset.length);
+    //   password += charset[randomIndex];
+    // }
     const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+[]{}|;:,.<>?';
-    let passLength = 15
+    const passLength = 15;
     let password = '';
-    for (let i = 0; i < passLength; i++) {
+    let includesNumber = false;
+  
+    while (password.length < passLength || !includesNumber) {
       const randomIndex = Math.floor(Math.random() * charset.length);
-      password += charset[randomIndex];
+      const randomChar = charset[randomIndex];
+      password += randomChar;
+      includesNumber = includesNumber || /\d/.test(randomChar);
     }
     this.newPassword = password;
     
