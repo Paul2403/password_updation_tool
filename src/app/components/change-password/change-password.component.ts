@@ -152,11 +152,13 @@ export class ChangePasswordComponent implements OnInit {
           this.validOTP=true;
         }
         else if(response.status == 100){
+          console.log('RESPONSE',response);
           this.headMsg='OTP Expired';
           this.optExpired=true;
           this.validOTP=true;
         }
         else{
+          console.log('RESPONSE',response);
           this.headMsg='Two-Factor Authentication';
           this.optExpired=false;
           this.validOTP=false;
